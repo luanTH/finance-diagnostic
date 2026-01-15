@@ -1,5 +1,9 @@
+/* resources/css/app.css */
 @import 'tailwindcss';
 
+/* O scanner deve partir de onde o arquivo CSS está (../js sobe para resources e entra em js) */
+@source '../js/**/*.vue';
+@source '../views/**/*.blade.php';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
 @source '../**/*.blade.php';

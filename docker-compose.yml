@@ -1,0 +1,51 @@
+version: "3.9"
+
+services:
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: finance-diagnostic-app
+        ports:
+            - "8002:80"
+        volumes:
+            - ./:/app
+        restart: always
+        networks:
+            - finance_diagnostic_network
+
+    mysql:
+        image: mysql:8.0
+        container_name: mysql_finance
+        restart: unless-stopped
+        environment:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: finance
+          MYSQL_USER: finance
+          MYSQL_PASSWORD: secret
+        ports:
+          - "3306:3306"
+        volumes:
+          - mysql_data:/var/lib/mysql
+        networks:
+          - finance_diagnostic_network
+
+    node:
+        image: node:20-alpine
+        container_name: finance-node
+        volumes:
+          - .:/app
+        working_dir: /app
+        ports:
+          - "5173:5173"
+        tty: true
+        networks:
+          - finance_diagnostic_network
+
+networks:
+    finance_diagnostic_network:
+        driver: bridge
+
+volumes:
+    mysql_data:
+        driver: local
