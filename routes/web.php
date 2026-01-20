@@ -23,6 +23,4 @@ Route::get('/', [DiagnosticController::class, 'index'])->name('diagnostic.index'
 Route::get('/pj', [DiagnosticController::class, 'index'])->name('diagnostic.index');
 Route::prefix('diagnostico')->group(function () {
     Route::post('/enviar', [DiagnosticController::class, 'store'])->name('diagnostic.store');
-    Route::get('/show/{id}', [DiagnosticController::class, 'show'])->name('diagnostic.show');
-    Route::get('/sucesso/{lead}', [DiagnosticController::class, 'success'])->name('diagnostic.success');
 });
