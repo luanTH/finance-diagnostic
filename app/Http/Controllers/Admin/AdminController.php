@@ -25,7 +25,7 @@ class AdminController extends Controller
                 $query->where('type', $type);
             })
             ->latest()
-            ->paginate(1)
+            ->paginate(10)
             ->withQueryString();
 
         return Inertia::render('Admin/Dashboard', [

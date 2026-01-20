@@ -29,7 +29,7 @@ console.log('leads', props.leads.links)
                         <h1 class="text-3xl font-black text-slate-900">Dashboard</h1>
                         <p class="text-slate-500">Gerencie seus {{ leads.total }} leads capturados</p>
                     </div>
-                    <button @click="logout" class="flex items-center gap-2 text-rose-500 font-bold hover:bg-rose-50 p-3 rounded-xl transition-all">
+                    <button @click="logout" class="flex items-center gap-2 text-rose-500 font-bold hover:bg-rose-50 p-3 rounded-xl transition-all cursor-pointer">
                         <LogOut class="w-5 h-5" /> Sair
                     </button>
                 </div>

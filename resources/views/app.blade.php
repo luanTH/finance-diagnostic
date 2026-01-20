@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
+        <link rel="icon" type="image/png" href="{{ asset('assets/images/icon-plannfinn.jpeg') }}">
+
+        <link rel="apple-touch-icon" href="{{ asset('assets/images/icon-plannfinn.jpeg') }}">
         @routes
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
