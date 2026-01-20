@@ -1,6 +1,6 @@
 /* resources/css/app.css */
 @import 'tailwindcss';
-
+@plugin "tailwindcss-animate";
 /* O scanner deve partir de onde o arquivo CSS está (../js sobe para resources e entra em js) */
 @source '../js/**/*.vue';
 @source '../views/**/*.blade.php';

@@ -20,12 +20,14 @@ export default defineConfig({
         tailwindcss(),
     ],
     server: {
-        // Essencial para o Docker: permite que o Vite aceite conexões externas
         host: '0.0.0.0',
+        port: 5173,         // <--- FORÇA A PORTA 5173
+        strictPort: true,   // <--- IMPEDE PULAR PARA 5174
         hmr: {
             host: 'localhost',
         },
         watch: {
+            usePolling: true, // Adicione isso para garantir que o Docker detecte mudanças no Windows/Mac
             ignored: ['**/storage/framework/views/**'],
         },
     },

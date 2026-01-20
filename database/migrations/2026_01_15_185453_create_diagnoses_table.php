@@ -25,6 +25,7 @@ return new class extends Migration
             $table->id();
             $table->string('name'); // ex: Gestão, Segurança, Expansão
             $table->text('description')->nullable();
+            $table->enum('type', ['pf', 'pj']); // Identificador de tipo
             $table->timestamps();
         });
 

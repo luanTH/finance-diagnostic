@@ -1,150 +1,178 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useForm, Head } from '@inertiajs/vue3';
-import { ChevronRight, ChevronLeft, Check, Wallet, Building, User, Target } from 'lucide-vue-next';
+import {
+    ChevronRight, ChevronLeft, Check, Wallet,
+    Send, Mail, CheckCircle, ShieldCheck, Loader2, Play
+} from 'lucide-vue-next';
 
-// Agora recebemos as perguntas com o relacionamento 'options' carregado
 const props = defineProps({
-    questions: Array
+    questions: Array,
+    type: String // 'pf' ou 'pj' vindo do controller
 });
 
-// Estado do formulário
-const step = ref(0);
+// Estados de Fluxo
+const step = ref(-1); // -1: Landing, 0 a N: Perguntas, N+1: Form Lead
+const submitted = ref(false);
+const lockNavigation = ref(false);
+
 const form = useForm({
-    lead: { name: '', email: '', phone: '', type: 'pf' },
-    // Armazena { question_id: option_id }
+    lead: {
+        name: '',
+        email: '',
+        phone: '',
+        type: props.type,
+        consent: false,
+        captcha_token: ''
+    },
     answers: {}
 });
 
-// Lógica de Navegação
-const totalSteps = computed(() => props.questions.length + 1);
-const progress = computed(() => (step.value / (totalSteps.value - 1)) * 100);
+// --- LÓGICA DE VALIDAÇÃO E MÁSCARA ---
 
-// Atalho para a pergunta atual (ajusta o índice pois o step 0 é o lead)
-const currentQuestion = computed(() => props.questions[step.value - 1]);
+const isEmailValid = computed(() => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(form.lead.email);
+});
 
-const next = () => {
-    if (step.value < totalSteps.value - 1) step.value++;
+const formatPhone = (value) => {
+    if (!value) return "";
+    value = value.replace(/\D/g, "");
+    value = value.replace(/(\d{2})(\d)/, "($1) $2");
+    value = value.replace(/(\d{5})(\d)/, "$1-$2");
+    return value.length > 15 ? value.substring(0, 15) : value;
 };
-const back = () => {
-    if (step.value > 0) step.value--;
-};
+
+watch(() => form.lead.phone, (newVal) => {
+    form.lead.phone = formatPhone(newVal);
+});
+
+const canSubmit = computed(() => {
+    return form.lead.name.length > 3 &&
+           isEmailValid.value &&
+           form.lead.phone.length >= 14 &&
+           form.lead.consent &&
+           !form.processing;
+});
+
+// --- NAVEGAÇÃO ---
+
+const next = () => step.value++;
+const back = () => { if (!lockNavigation.value) step.value--; };
 
 const selectOption = (questionId, optionId) => {
     form.answers[questionId] = optionId;
-    // Pequeno delay para o usuário ver o feedback visual antes de passar
-    setTimeout(() => {
-        next();
-    }, 300);
+    setTimeout(() => next(), 300);
 };
 
 const submit = () => {
+    lockNavigation.value = true;
     form.post(route('diagnostic.store'), {
         preserveScroll: true,
-        onSuccess: () => console.log('Diagnóstico enviado com sucesso!')
+        onSuccess: () => { submitted.value = true; }
     });
 };
 </script>
 
 <template>
-    <Head title="Diagnóstico Financeiro" />
+    <Head title="Diagnóstico Financeiro Profissional" />
 
-    <div class="min-h-screen w-full bg-slate-100 flex flex-col items-center justify-center p-4">
+    <div class="main-container">
+        <div class="dark-overlay"></div>
 
-        <div class="w-full max-w-2xl mb-6">
-            <div class="h-2 w-full bg-slate-200 rounded-full overflow-hidden">
-                <div class="h-full bg-indigo-600 transition-all duration-500 ease-out" :style="`width: ${progress}%`"></ div>
+        <div class="logo-wrapper animate-in fade-in duration-1000">
+            <div class="flex items-center gap-3">
+                <div class="logo-icon"><img src="/assets/images/plannfinn.png" alt=""></div>
+                <div class="flex flex-col">
+                    <span class="logo-text">Plannfinn Family Office</span>
+                    <span class="logo-sub">Negócios e Finanças</span>
+                </div>
             </div>
         </div>
 
-        <div class="w-full max-w-2xl bg-white rounded-[2.5rem] shadow-2xl p-8 md:p-14 border border-slate-200">
+        <div class="glass-card" :class="{ 'scale-95 opacity-50': form.processing }">
+
             <form @submit.prevent>
 
-                <div v-if="step === 0" class="animate-in fade-in slide-in-from-right-8 duration-500">
-                    <div class="flex items-center gap-3 mb-6 text-indigo-600">
-                        <Wallet class="w-8 h-8" />
-                        <span class="font-bold tracking-tighter text-xl">FINANCE_DIAG</span>
-                    </div>
-                    <h1 class="text-3xl font-extrabold text-slate-900 leading-tight mb-4">
-                        Olá! Vamos iniciar sua <span class="text-indigo-600">análise financeira.</span>
+                <div v-if="step === -1" class="step-content text-center">
+                    <h1 v-if="type=='pf'" class="text-4xl font-black text-slate-900 mb-6">
+                        Descubra o potencial da sua saúde <span class="text-indigo-600">financeira.</span>
                     </h1>
-                    <p class="text-slate-500 mb-8">Preencha seus dados para começarmos as perguntas personalizadas.</p>
-
-                    <div class="space-y-4">
-                        <div class="group">
-                            <label class="text-xs font-bold text-slate-400 uppercase ml-2 mb-1 block">Nome Completo</label>
-                            <input v-model="form.lead.name" type="text" placeholder="Ex: João Silva" class="custom-input" />
-                        </div>
-                        <div class="group">
-                            <label class="text-xs font-bold text-slate-400 uppercase ml-2 mb-1 block">E-mail</label>
-                            <input v-model="form.lead.email" type="email" placeholder="seu@email.com" class="custom-input" />
-                        </div>
-                        <div class="group">
-                            <label class="text-xs font-bold text-slate-400 uppercase ml-2 mb-1 block">Telefone / WhatsApp</label>
-                            <input v-model="form.lead.phone" type="text" placeholder="(00) 00000-0000" class="custom-input" />
-                        </div>
-
-                        <div class="flex gap-4 pt-2">
-                            <button type="button" @click="form.lead.type = 'pf'" :class="form.lead.type === 'pf' ? 'type-btn-active' : 'type-btn-inactive'">
-                                <User class="w-5 h-5" /> Pessoa Física
-                            </button>
-                            <button type="button" @click="form.lead.type = 'pj'" :class="form.lead.type === 'pj' ? 'type-btn-active' : 'type-btn-inactive'">
-                                <Building class="w-5 h-5" /> Empresa / PJ
-                            </button>
-                        </div>
-                    </div>
+                    <h1 v-else class="text-4xl font-black text-slate-900 mb-6">
+                        Descubra o potencial da saúde <span class="text-indigo-600">financeira</span> da sua empresa.
+                    </h1>
+                    <p class="text-slate-500 text-lg mb-10">
+                        Preparamos um questionário estratégico para identificar gargalos e oportunidades no seu perfil de {{ type === 'pf' ? 'Pessoa Física' : 'Empresa' }}.
+                    </p>
+                    <button @click="next" class="start-btn group">
+                        Iniciar Questionário <Play class="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </button>
                 </div>
 
-                <div v-else class="animate-in fade-in slide-in-from-right-8 duration-500">
-                    <div class="flex justify-between items-center mb-6">
-                        <span class="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full font-bold text-xs uppercase tracking-wider">
-                            {{ currentQuestion.category?.name || 'Geral' }}
-                        </span>
-                        <p class="text-slate-400 font-bold text-xs uppercase tracking-widest">Questão {{ step }} de {{ questions.length }}</p>
+                <div v-else-if="step >= 0 && step < questions.length" class="step-content">
+                    <div class="progress-bar-container">
+                        <div class="progress-fill" :style="`width: ${((step + 1) / questions.length) * 100}%`"></div>
                     </div>
 
-                    <h2 class="text-2xl font-bold text-slate-800 mb-8 leading-snug">
-                        {{ currentQuestion.text }}
-                    </h2>
+                    <span class="category-tag">{{ questions[step].category?.name }}</span>
+                    <h2 class="question-text">{{ questions[step].text }}</h2>
 
-                    <div class="grid gap-3">
-                        <button
-                            v-for="option in currentQuestion.options"
-                            :key="option.id"
-                            type="button"
-                            @click="selectOption(currentQuestion.id, option.id)"
-                            :class="form.answers[currentQuestion.id] === option.id ? 'option-btn-active' : 'option-btn-inactive'"
-                        >
-                            <span class="text-left pr-4">{{ option.text }}</span>
-                            <div class="min-w-[24px]">
-                                <Check v-if="form.answers[currentQuestion.id] === option.id" class="w-6 h-6" />
-                                <div v-else class="w-6 h-6 rounded-full border-2 border-slate-200"></div>
-                            </div>
+                    <div class="options-grid">
+                        <button v-for="opt in questions[step].options" :key="opt.id" type="button"
+                            @click="selectOption(questions[step].id, opt.id)"
+                            :class="form.answers[questions[step].id] === opt.id ? 'opt-active cursor-pointer' : 'opt-inactive cursor-pointer'">
+                            {{ opt.text }}
+                            <Check v-if="form.answers[questions[step].id] === opt.id" class="w-5 h-5" />
                         </button>
                     </div>
                 </div>
 
-                <div class="flex items-center justify-between mt-12 pt-8 border-t border-slate-50">
-                    <button type="button" v-if="step > 0" @click="back" class="flex items-center text-slate-400 hover:text-slate-600 font-medium transition-colors">
-                        <ChevronLeft class="w-5 h-5 mr-1" /> Voltar
-                    </button>
-                    <div v-else></div>
+                <div v-else-if="step === questions.length && !submitted" class="step-content">
+                    <h2 class="text-3xl font-black text-slate-900 mb-2">Quase lá!</h2>
+                    <p class="text-slate-500 mb-8">Para seguir nos informe seus dados para envio do relatório completo para seu melhor email</p>
 
-                    <button v-if="step === 0" type="button" @click="next" :disabled="!form.lead.name || !form.lead.email" class="primary-btn disabled:opacity-50 disabled:grayscale">
-                        Começar Diagnóstico <ChevronRight class="ml-2 w-5 h-5" />
-                    </button>
+                    <div class="space-y-4">
+                        <input v-model="form.lead.name" type="text" placeholder="Seu nome completo" class="form-input" />
 
-                    <button v-else-if="step === questions.length" type="button" @click="submit" :disabled="form.processing" class="success-btn">
-                        <div v-if="form.processing" class="flex items-center gap-3">
-                            <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                            IA Analisando seus dados...
+                        <div class="relative">
+                            <input v-model="form.lead.email" type="email" placeholder="Seu e-mail principal"
+                                :class="['form-input', form.lead.email && !isEmailValid ? 'border-red-500 bg-red-50' : '']" />
+                            <p v-if="form.lead.email && !isEmailValid" class="text-red-500 text-xs mt-1 ml-2 font-bold">Por favor, insira um e-mail válido.</p>
                         </div>
-                        <span v-else class="flex items-center text-lg">Gerar Meu Diagnóstico <Check class="ml-2 w-6 h-6" /></span>
-                    </button>
+
+                        <input v-model="form.lead.phone" type="text" placeholder="(00) 00000-0000" class="form-input" />
+
+                        <label class="flex items-start gap-3 p-4 bg-slate-50 rounded-2xl cursor-pointer hover:bg-slate-100 transition-colors">
+                            <input v-model="form.lead.consent" type="checkbox" class="mt-1 w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" />
+                            <span class="text-sm text-slate-600 leading-tight font-medium">
+                                Aceito os termos de uso e autorizo o envio do diagnóstico para o meu e-mail.
+                            </span>
+                        </label>
+
+                        <div class="captcha-placeholder">
+                            <ShieldCheck class="w-5 h-5 text-indigo-400" />
+                            <span class="text-xs text-slate-400 font-bold uppercase tracking-widest">Proteção Anti-Bot Ativa</span>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col mt-8 gap-4">
+                        <button @click="submit" :disabled="!canSubmit" class="submit-btn">
+                            <span v-if="form.processing" class="flex items-center gap-2"><Loader2 class="animate-spin" /> Processando...</span>
+                            <span v-else class="flex items-center gap-2">Gerar e Enviar Diagnóstico <Send class="w-5 h-5" /></span>
+                        </button>
+                        <button v-if="!lockNavigation" @click="back" class="text-slate-400 font-bold text-sm">Voltar e revisar respostas</button>
+                    </div>
                 </div>
+
+                <div v-else class="step-content text-center py-10">
+                    <div class="success-icon"><CheckCircle class="w-20 h-20" /></div>
+                    <h1 class="text-3xl font-black text-slate-900 mb-4">Relatório Enviado!</h1>
+                    <p class="text-slate-600 mb-8 leading-relaxed">
+                        Verifique sua caixa de entrada (e a pasta de spam) em instantes.
+                        O diagnóstico detalhado já está a caminho.
+                    </p>
+                </div>
+
             </form>
         </div>
     </div>
@@ -153,11 +181,61 @@ const submit = () => {
 <style scoped>
 @reference "../../../css/app.css";
 
-.custom-input { @apply w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-indigo-500 focus:bg-white transition-all text-slate-700 text-lg; }
-.primary-btn { @apply bg-indigo-600 hover:bg-indigo-700 text-white px-10 py-4 rounded-2xl font-bold flex items-center shadow-lg shadow-indigo-200 transition-all active:scale-95; }
-.success-btn { @apply bg-emerald-500 hover:bg-emerald-600 text-white px-10 py-5 rounded-2xl font-extrabold flex items-center shadow-xl shadow-emerald-200 transition-all active:scale-95 disabled:opacity-50; }
-.type-btn-active { @apply flex-1 flex items-center justify-center gap-2 p-4 bg-indigo-50 border-2 border-indigo-600 text-indigo-700 rounded-xl font-bold transition-all; }
-.type-btn-inactive { @apply flex-1 flex items-center justify-center gap-2 p-4 bg-white border-2 border-slate-100 text-slate-400 rounded-xl font-medium hover:border-slate-200 transition-all; }
-.option-btn-active { @apply flex items-center justify-between p-6 bg-indigo-600 text-white rounded-2xl font-bold border-2 border-indigo-600 transition-all transform scale-[1.02] shadow-md; }
-.option-btn-inactive { @apply flex items-center justify-between p-6 bg-white text-slate-600 rounded-2xl font-medium border-2 border-slate-100 hover:border-indigo-200 hover:bg-slate-50 transition-all; }
+/* Layout e Fundo */
+.main-container {
+    @apply min-h-screen w-full flex flex-col items-center justify-center p-4 relative overflow-hidden bg-[#0f1115];
+}
+
+.dark-overlay {
+    @apply absolute inset-0 bg-gradient-to-br from-blue-950 via-gray-900 to-blue-950 backdrop-blur-3xl pointer-events-none;
+}
+
+/* Caixa Principal - Foco em Visibilidade */
+.glass-card {
+    @apply w-full max-w-2xl bg-white rounded-[2rem] shadow-[0_30px_100px_rgba(0,0,0,0.5)]
+    z-10 relative border border-slate-200 transition-all duration-500;
+}
+
+.step-content { @apply p-8 md:p-14 animate-in fade-in slide-in-from-bottom-4 duration-500; }
+
+/* Logo */
+.logo-wrapper { @apply mb-10 z-10; }
+.logo-icon { @apply object-cover w-14 rounded-full overflow-hidden; }
+.logo-text { @apply text-white font-black text-2xl tracking-tighter leading-none; }
+.logo-sub { @apply text-indigo-400 text-[10px] font-bold uppercase tracking-[0.3em]; }
+
+/* Inputs e UI */
+.form-input {
+    @apply w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none
+    focus:border-indigo-500 focus:bg-white transition-all text-slate-700 font-medium;
+}
+
+.start-btn {
+    @apply bg-indigo-600 hover:bg-indigo-700 text-white px-12 py-5 rounded-[1.5rem]
+    font-black text-xl shadow-2xl shadow-indigo-500/40 flex items-center mx-auto transition-all cursor-pointer;
+}
+
+.submit-btn {
+    @apply w-full py-5 rounded-2xl font-black text-xl flex items-center justify-center transition-all
+    disabled:bg-slate-100 disabled:text-slate-300 bg-emerald-500 hover:bg-emerald-600 text-white shadow-xl shadow-emerald-500/20 cursor-pointer;
+}
+
+.category-tag { @apply px-3 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-black uppercase tracking-widest mb-4 inline-block; }
+.question-text { @apply text-2xl md:text-3xl font-bold text-slate-800 mb-8 leading-tight; }
+
+.options-grid { @apply grid gap-3; }
+.opt-inactive { @apply p-5 bg-white border-2 border-slate-100 rounded-2xl text-left font-bold text-slate-600 hover:border-indigo-200 transition-all flex justify-between items-center; }
+.opt-active { @apply p-5 bg-indigo-600 border-2 border-indigo-600 rounded-2xl text-left font-black text-white shadow-lg shadow-indigo-100 flex justify-between items-center scale-[1.02]; }
+
+.progress-bar-container { @apply w-full h-1.5 bg-slate-100 rounded-full mb-10 overflow-hidden; }
+.progress-fill { @apply h-full bg-indigo-600 transition-all duration-500; }
+
+.captcha-placeholder { @apply flex items-center justify-center gap-2 p-3 border-2 border-dashed border-slate-200 rounded-2xl; }
+
+.success-icon { @apply inline-flex p-6 bg-emerald-50 text-emerald-500 rounded-full mb-6; }
+
+@media (max-width: 640px) {
+    .step-content { @apply p-6; }
+    .question-text { @apply text-xl; }
+}
 </style>

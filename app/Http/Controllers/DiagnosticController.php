@@ -10,17 +10,32 @@ use App\Services\DiagnosticService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
+use App\Mail\DiagnosticReportMail;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Mail;
 
 class DiagnosticController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $questions = Question::with(['category', 'options' => function ($q) {
-            $q->orderBy('id', 'asc'); // Ou qualquer ordem que faça sentido
-        }])->where('is_active', true)->orderBy('order')->get();
+        $type = str_ends_with($request->url(), '/pj') ? 'pj' : 'pf';
+
+        $questions = Question::with([
+            'category',
+            'options' => function ($q) {
+                $q->orderBy('id', 'asc');
+            }
+        ])
+            ->where('is_active', true)
+            ->whereHas('category', function ($q) use ($type) {
+                $q->where('type', $type);
+            })
+            ->orderBy('order')
+            ->get();
 
         return Inertia::render('Diagnostic/Form', [
             'questions' => $questions,
+            'type' => $type
         ]);
     }
 
@@ -47,7 +62,7 @@ class DiagnosticController extends Controller
             }
 
             // 3. Gera o Diagnóstico Inteligente
-            $report = $service->generate($request->answers);
+            $report = $service->generate($request->answers, $lead->type);
 
             // 4. Salva o registro do diagnóstico
             $diagnostic = Diagnosis::create([
@@ -56,8 +71,21 @@ class DiagnosticController extends Controller
                 'total_score' => $report['score_total'],
             ]);
 
+            $lead->load(['answers.question.category', 'answers.option']);
+
+            // Passamos o report e o lead para a view
+            $pdf = Pdf::loadView('pdf.diagnostic', [
+                'lead' => $lead,
+                'report' => $report
+            ]);
+
+            $pdfBinary = $pdf->output();
+
+            Mail::to($lead->email)->send(new DiagnosticReportMail($lead, $pdfBinary));
+
             // 5. Retorna para o Front com os dados
-            return redirect()->route('diagnostic.show', $diagnostic->id);
+            return back()->with('success', 'Diagnóstico enviado com sucesso!');
+            // return redirect()->route('diagnostic.show', $diagnostic->id);
         });
     }
 
@@ -69,5 +97,48 @@ class DiagnosticController extends Controller
             'report' => json_decode($diagnostic->results),
             'lead' => $diagnostic->lead,
         ]);
+    }
+
+    public function pdfView(int $id, DiagnosticService $service)
+    {
+        $lead = Lead::with(['answers.question.category', 'answers.option'])->findOrFail($id);
+
+        // 2. Extrai apenas os IDs das opções selecionadas para o serviço
+        $optionIds = $lead->answers->pluck('option_id')->toArray();
+
+        // 3. Gera o diagnóstico usando a nova lógica
+        $report = $service->generate($optionIds, $lead->type);
+
+        // dd($report);
+
+        // 4. Renderiza o PDF para visualização no navegador (stream)
+        return Pdf::loadView('pdf.diagnostic', compact('lead', 'report'))
+            ->setPaper('a4', 'portrait')
+            ->stream("diagnostico_{$lead->name}.pdf");
+    }
+
+    public function reenviarEmail(int $id, DiagnosticService $service)
+    {
+        $lead = Lead::with(['answers.question.category', 'answers.option'])->findOrFail($id);
+
+        // 2. Extrai apenas os IDs das opções selecionadas para o serviço
+        $optionIds = $lead->answers->pluck('option_id')->toArray();
+
+        // 3. Gera o diagnóstico usando a nova lógica
+        $report = $service->generate($optionIds, $lead->type);
+
+        $lead->load(['answers.question.category', 'answers.option']);
+
+        // Passamos o report e o lead para a view
+        $pdf = Pdf::loadView('pdf.diagnostic', [
+            'lead' => $lead,
+            'report' => $report
+        ]);
+
+        $pdfBinary = $pdf->output();
+
+        Mail::to($lead->email)->send(new DiagnosticReportMail($lead, $pdfBinary));
+
+        return response()->json('Email reenviado');
     }
 }

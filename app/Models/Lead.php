@@ -26,8 +26,8 @@ class Lead extends Model
         return $this->hasMany(Answer::class);
     }
 
-    public function diagnoses(): BelongsTo
+    public function diagnoses(): HasMany
     {
-        return $this->belongsTo(Diagnosis::class);
+        return $this->hasMany(Diagnosis::class);
     }
 }
