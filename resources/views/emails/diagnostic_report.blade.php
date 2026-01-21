@@ -10,7 +10,7 @@
         @if($lead->type === 'pj')
             {{-- TEXTO FOCADO EM EMPRESA (PJ) --}}
             <p style="font-size: 15px; line-height: 1.6; color: #475569;">
-                É um prazer acompanhar a evolução do seu negócio. Transformar dados operacionais em <strong>inteligência estratégica</strong> é o caminho mais seguro para aumentar a lucratividade e garantir a perenidade da sua empresa.
+                É um prazer acompanhar a evolução do seu negócio. Transformar dados operacionais em <strong>inteligência estratégica</strong> é o caminho mais seguro para aumentar a lucratividade e garantir prosperidade para a sua empresa.
             </p>
 
             <p style="font-size: 15px; line-height: 1.6; color: #475569;">
@@ -19,8 +19,8 @@
 
             <div style="background: #f1f5ff; padding: 25px; border-radius: 12px; margin: 30px 0; border-left: 5px solid #4f46e5;">
                 <p style="margin: 0; font-size: 14px; color: #1e1b4b; font-weight: 500;">
-                    <strong>Qual o próximo nível da sua gestão?</strong><br>
-                    Um diagnóstico aponta os gargalos; a <strong>Gestão Estratégica</strong> é a solução. Otimizamos seu fluxo de caixa, revisamos sua precificação e preparamos sua operação para escalar com lucro real.
+                    <strong>Qual o próximo passo agora?</strong><br>
+                    Um diagnóstico aponta os gargalos; o <strong>Planejamento Estratégico</strong> é a solução. Otimizamos seu fluxo de caixa, revisamos sua precificação e preparamos sua operação para escalar com lucro real.
                 </p>
             </div>
 
@@ -50,7 +50,7 @@
             <div style="text-align: center; margin: 40px 0;">
                 <a href="https://wa.me/5598984068970?text=Olá! Recebi meu diagnóstico e quero agendar meu planejamento financeiro completo."
                    style="background-color: #4f46e5; color: #ffffff; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block;">
-                    Agendar Planejamento Completo
+                    Quero Planejamento com um Especialista
                 </a>
             </div>
         @endif

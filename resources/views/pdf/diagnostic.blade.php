@@ -10,7 +10,6 @@
 
         .header { position: fixed; top: -90px; left: 0; right: 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; text-align: right; color: #94a3b8; font-size: 9px; text-transform: uppercase;}
 
-        /* Footer com links clicáveis */
         .footer { position: fixed; bottom: -50px; left: 0; right: 0; border-top: 1px solid #e2e8f0; padding-top: 10px; text-align: center; color: #64748b; font-size: 9px; line-height: 1.3; }
         .footer a { text-decoration: none; color: #64748b; }
 
@@ -29,97 +28,137 @@
             text-align: center;
             border-radius: 0 8px 8px 0;
         }
+
         .intro-phrase-text { font-size: 14px; color: #1e1b4b; font-style: italic; }
 
-        .section-title { font-size: 13px; font-weight: bold; margin-top: 25px; margin-bottom: 10px; color: #1e293b; text-transform: uppercase; border-bottom: 2px solid #f1f5f9; padding-bottom: 3px; }
+        .section-title { font-size: 13px; font-weight: bold; margin-top: 25px; margin-bottom: 10px; color: #1e293b; text-transform: uppercase; border-bottom: 2px solid #f1f5f9; padding-bottom: 3px;page-break-after: avoid;}
 
-        .card { padding: 15px; border-radius: 10px; margin-bottom: 10px; }
+        .card { padding: 15px; border-radius: 10px; margin-bottom: 10px;page-break-inside: avoid;display: block; }
         .card-strong { background-color: #ecfdf5; color: #065f46; border: 1px solid #d1fae5; }
         .card-weak { background-color: #fef2f2; color: #991b1b; border: 1px solid #fee2e2; }
 
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        table tr { page-break-inside: avoid; }
         th { background-color: #f8fafc; text-align: left; padding: 10px; font-size: 9px; color: #64748b; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; }
         td { padding: 12px 10px; border-bottom: 1px solid #f8fafc; vertical-align: top; }
+        thead { display: table-header-group; }
+
         .p-name { font-weight: bold; color: #1e293b; font-size: 11px; }
         .p-msg { font-size: 10px; color: #475569; }
         .p-action { font-size: 10px; font-weight: bold; color: #4f46e5; }
 
         /* NOVO DESIGN: Veredicto / Conclusão */
         .section-divider {
-        border-top: 1px solid #e2e8f0;
-        margin: 40px 0;
-        width: 100%;
-    }
+            border-top: 1px solid #e2e8f0;
+            margin: 40px 0;
+            width: 100%;
+        }
 
-    /* CONCLUSÃO ESTRATÉGICA - Visual de Resumo Executivo */
-    .veredicto-container {
-        margin-top: 20px;
-        margin-bottom: 30px;
-        padding: 20px;
-        border: 1px solid #065f46;
-        border-radius: 4px;
-        position: relative;
-    }
+        .veredicto-container {
+            margin-top: 20px;
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #065f46;
+            border-radius: 4px;
+            position: relative;
+            page-break-inside: avoid;
+        }
 
-    .veredicto-header {
-        position: absolute;
-        top: -12px;
-        left: 20px;
-        background: #ffffff;
-        padding: 0 10px;
-        font-size: 12px;
-        text-transform: uppercase;
-        font-weight: bold;
-        color: #065f46;
-    }
+        .veredicto-header {
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: #ffffff;
+            padding: 0 10px;
+            font-size: 12px;
+            text-transform: uppercase;
+            font-weight: bold;
+            color: #065f46;
+        }
 
-    .veredicto-content {
-        font-size: 13px;
-        line-height: 1.6;
-        color: #1e293b;
-        text-align: center;
-        font-style: italic; /* Diferencia da frase inicial do topo */
-    }
+        .veredicto-content {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #1e293b;
+            text-align: center;
+            font-style: italic; /* Diferencia da frase inicial do topo */
+        }
 
-    /* CTA - Focado em Espaço e Botão */
-    .cta-container {
-        page-break-inside: avoid;
-        text-align: center;
-        padding: 20px 0;
-    }
+        /* CTA - Focado em Espaço e Botão */
+        .cta-container {
+            page-break-inside: avoid;
+            text-align: center;
+            padding: 20px 0;
+        }
 
-    .cta-title {
-        font-size: 18px;
-        font-weight: bold;
-        color: #4f46e5;
-        margin-bottom: 15px;
-    }
+        .cta-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #4f46e5;
+            margin-bottom: 15px;
+        }
 
-    .cta-text {
-        font-size: 13px;
-        color: #64748b;
-        max-width: 80%;
-        margin: 0 auto 25px auto;
-        line-height: 1.5;
-    }
+        .cta-text {
+            font-size: 13px;
+            color: #64748b;
+            max-width: 80%;
+            margin: 0 auto 25px auto;
+            line-height: 1.5;
+        }
 
-    .cta-button {
-        display: inline-block;
-        padding: 14px 35px;
-        background-color: #4f46e5;
-        color: #ffffff;
-        text-decoration: none;
-        font-weight: bold;
-        font-size: 13px;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    }
+        .cta-button {
+            display: inline-block;
+            padding: 14px 35px;
+            background-color: #4f46e5;
+            color: #ffffff;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 13px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
 
-        .page-break { page-break-before: always; }
+        .bloco-analise-grupo {
+            page-break-inside: avoid;
+        }
+        /* Classe utilitária para forçar quebra se a lógica do Blade decidir */
+        .page-break {
+            page-break-before: always;
+        }
+
+        .keep-together { page-break-inside: avoid; }
+
+        /* Força quebra de página antes do elemento */
+        .force-page-break {
+            page-break-before: always;
+        }
     </style>
 </head>
 <body>
+   @php
+    // Pesos aproximados para o DomPDF (ajuste conforme sua fonte)
+    $pesoTitulo = 3;
+    $pesoLinha = 1.2;
+    $limitePagina1 = 22; // Capacidade total de "unidades" da sua primeira página
 
+    // Cálculo do Bloco A (Fortes + Prioridades)
+    $itensFortes = count($report['pontos_fortes']) ?: 1;
+    $itensPrioridades = count($report['pontos_melhorar']) ?: 1;
+    $pesoBlocoA = ($itensFortes * $pesoLinha) + ($itensPrioridades * $pesoLinha) + ($pesoTitulo * 2);
+
+    // Cálculo do Bloco B (Desenvolver)
+    $itensDesenvolver = count($report['pontos_desenvolver']);
+    $pesoBlocoB = $itensDesenvolver > 0 ? ($itensDesenvolver * $pesoLinha) + $pesoTitulo : 0;
+
+    // DECISÃO INTELIGENTE
+    // 1. O Bloco B deve mudar de página? (Se o Bloco A + B estourarem o limite)
+    $blocoBVaiParaPagina2 = ($pesoBlocoA + $pesoBlocoB) > $limitePagina1;
+
+    // 2. A Tabela deve mudar de página?
+    // Ela SEMPRE muda se o conteúdo for "pouco" (para ficar limpa na pag 2)
+    // OU se o Bloco B já foi pra lá.
+    $tabelaVaiParaPagina2 = true;
+@endphp
     <div class="header">RELATÓRIO FINANCEIRO {{$lead->type == 'pf' ? " PF " : " PJ "}} | {{ $lead->name }}</div>
 
     <div class="footer">
@@ -149,29 +188,40 @@
 
     <div class="card card-strong">
         <strong style="font-size: 12px;"><span>&#10003;</span> PONTOS FORTES</strong>
-        <ul style="margin: 8px 0 0 15px; padding: 0;">
-            @foreach($report['pontos_fortes'] as $ponto)
-            <li style="margin-bottom: 5px;">{!! $ponto !!}</li>
-            @endforeach
-        </ul>
+            <ul style="margin: 8px 0 0 15px; padding: 0;">
+                @if (count($report['pontos_fortes']))
+                    @foreach($report['pontos_fortes'] as $ponto)
+                        <li style="margin-bottom: 5px;">{!! $ponto !!}</li>
+                    @endforeach
+                @else
+                    <li style="margin-bottom: 5px;">Nenhum ponto forte encontrado. Converse com um especialista para regulizarizar suas finanças o quanto antes.</li>
+                @endif
+            </ul>
     </div>
 
     <div class="card card-weak">
         <strong style="font-size: 12px;">⚠️ ÊNFASES DE PRIORIDADES</strong>
-        <ul style="margin: 8px 0 0 15px; padding: 0;">
-            @foreach($report['pontos_desenvolver'] as $ponto)
-                <li style="margin-bottom: 5px;">{!! $ponto !!}</li>
-            @endforeach
-        </ul>
+            <ul style="margin: 8px 0 0 15px; padding: 0;">
+                @if (count($report['pontos_melhorar']))
+                    @foreach($report['pontos_melhorar'] as $ponto)
+                        <li style="margin-bottom: 5px;">{!! $ponto !!}</li>
+                    @endforeach
+                @else
+                    <li style="margin-bottom: 5px;">Nenhuma prioridade detectada por hora. Converse com um especialista para se manter estável e crescer ainda mais.</li>
+                @endif
+            </ul>
     </div>
 
-    @if(count($report['pontos_melhorar']) > 0)
-        <div class="card" style="background-color: #fffbeb; color: #92400e; border: 1px solid #fef3c7; margin-bottom: 10px;">
+{{-- Aqui decidimos se este bloco começa na página atual ou na próxima --}}
+{{-- INÍCIO DO BLOCO INTELIGENTE --}}
+<div class="{{ $blocoBVaiParaPagina2 ? 'page-break' : '' }}">
+    @if(count($report['pontos_desenvolver']) > 0)
+         <div class="card" style="background-color: #fffbeb; color: #92400e; border: 1px solid #fef3c7; margin-bottom: 10px;">
             <div style="display: block; margin-bottom: 8px;">
                 <strong style="font-size: 12px; color: #92400e;"> ➔ PONTOS A DESENVOLVER</strong>
             </div>
             <ul style="margin: 5px 0 0 25px; padding: 0; list-style-type: none;">
-                @foreach($report['pontos_melhorar'] as $ponto)
+                @foreach($report['pontos_desenvolver'] as $ponto)
                     <li style="margin-bottom: 5px; position: relative;">
                         <span style="color: #f59e0b; position: absolute; left: -15px;">•</span> {!! $ponto !!}
                     </li>
@@ -180,29 +230,35 @@
         </div>
     @endif
 
-<div class="page-break"></div>
+    {{-- Se o Bloco B NÃO mudou de página, mas queremos a tabela na 2, forçamos aqui --}}
+    @if(!$blocoBVaiParaPagina2 && $tabelaVaiParaPagina2)
+        <div class="page-break"></div>
+    @endif
+
     <div class="section-title">Análise Detalhada por Pilar</div>
-    <table>
-        <thead>
-            <tr>
-                <th width="25%">Pilar Analisado</th>
-                <th width="45%">Diagnóstico Situacional</th>
-                <th width="30%">Ação Recomendada</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach($report['diagnosticos_especificos'] as $diag)
-            <tr>
-                <td>
-                    <span class="p-name">{{ $diag['tema'] }}</span><br>
-                    <small style="color: #94a3b8; font-size: 8px;">Score: {{ $diag['percent'] }}%</small>
-                </td>
-                <td class="p-msg">{{ $diag['mensagem'] }}</td>
-                <td class="p-action">{{ $diag['acao'] }}</td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background-color: #f8fafc;">
+                    <th width="25%">Pilar Analisado</th>
+                    <th width="45%">Diagnóstico Situacional</th>
+                    <th width="30%">Ação Recomendada</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($report['diagnosticos_especificos'] as $diag)
+                <tr>
+                    <td>
+                        <span class="p-name">{{ $diag['tema'] }}</span><br>
+                        <small style="color: #94a3b8; font-size: 8px;">Score: {{ $diag['percent'] }}%</small>
+                    </td>
+                    <td class="p-msg">{{ $diag['mensagem'] }}</td>
+                    <td class="p-action">{{ $diag['acao'] }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+</div>
 
 <div class="veredicto-container">
     <div class="veredicto-header">Veredito Estratégico</div>
@@ -229,7 +285,7 @@
         </p>
         <a href="https://wa.me/5598984068970?text=Olá! Gostaria de saber mais sobre o Planejamento Financeiro Completo." class="cta-button">
             Quero meu Planejamento Personalizado
-        </a>
+            </a>
     @endif
 </div>
 

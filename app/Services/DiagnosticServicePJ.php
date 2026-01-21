@@ -12,7 +12,7 @@ class DiagnosticServicePJ
     const LEVEL_WEAK    = 'weak';
 
     private int $thresholdStrong = 75;
-    private int $thresholdWeak   = 45;
+    private int $thresholdWeak   = 50;
 
     public function generate(array $selectedOptionIds): array
     {
@@ -23,25 +23,26 @@ class DiagnosticServicePJ
         $categoryScores = $this->calculateCategoryScores($options);
         $totalScore     = $options->sum('points');
 
-        // 1. FORTES: Acima ou igual ao limite de força (ex: 75%)
+        // 1. FORTES: Acima ou igual ao limite de força (75%)
         $strengths = $categoryScores->filter(fn($c) => $c['percent'] >= $this->thresholdStrong);
 
-        // 2. RUINS (Melhorar): Abaixo ou igual ao limite de fraqueza (ex: 45%)
+        // 2. RUINS: Abaixo ou igual ao limite de fraqueza (45%)
         $weaknesses = $categoryScores->filter(fn($c) => $c['percent'] <= $this->thresholdWeak);
 
-        // 3. MEDIANOS (Desenvolver): O que está no "limbo" entre os dois
+        // 3. MEDIANOS: O que está no "limbo" entre os dois (45% a 75%)
         $averages = $categoryScores->filter(
-            fn($c) =>
-            $c['percent'] > $this->thresholdWeak &&
-                $c['percent'] < $this->thresholdStrong
+            fn($c) => $c['percent'] > $this->thresholdWeak && $c['percent'] < $this->thresholdStrong
         );
 
         return [
             'tipo'                     => 'pj',
             'frase_atual'              => $this->getCurrentSituationPhrase($categoryScores),
+
+            // Mapeamento exato seguindo sua solicitação
             'pontos_fortes'            => $this->mapExactPoints($strengths, 'strong'),
-            'pontos_desenvolver'          => $this->mapExactPoints($weaknesses, 'weak'), // Os "ruins"
-            'pontos_melhorar'       => $this->mapPriorities($averages),           // Os "medianos"
+            'pontos_melhorar'       => $this->mapExactPoints($weaknesses, 'weak'), // Os "ruins"
+            'pontos_desenvolver'          => $this->mapPriorities($averages),           // Os "medianos"
+
             'diagnosticos_especificos' => $this->getSpecificDiagnostics($categoryScores),
             'geral'                    => $this->getGeneralSolution($categoryScores),
             'score_total'              => $totalScore,
@@ -49,7 +50,7 @@ class DiagnosticServicePJ
     }
 
     /**
-     * Termos técnicos para o relatório da Empresa
+     * Termos técnicos para o relatório da Empresa (Fortes e Ruins)
      */
     private function mapExactPoints(Collection $categories, string $level): array
     {
@@ -89,9 +90,12 @@ class DiagnosticServicePJ
             }
         }
 
-        return array_unique($results);
+        return array_values(array_unique($results));
     }
 
+    /**
+     * Termos focados em Ênfase/Prioridade para as categorias medianas
+     */
     private function mapPriorities(Collection $categories): array
     {
         $priorityMap = [
@@ -107,7 +111,25 @@ class DiagnosticServicePJ
             'Crescimento e Escala'      => 'Planejamento de Expansão',
         ];
 
-        return $categories->map(fn($c) => $priorityMap[$c['name']] ?? null)->filter()->unique()->values()->all();
+        return $categories->map(fn($c) => $priorityMap[$c['name']] ?? null)
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+    }
+
+    private function calculateCategoryScores($options)
+    {
+        return $options->groupBy('question.category.name')->map(function ($items) {
+            $score = $items->sum('points');
+            $max   = $items->count() * 3;
+            return [
+                'name'    => $items->first()->question->category->name,
+                'score'   => $score,
+                'max'     => $max,
+                'percent' => ($score / $max) * 100,
+            ];
+        });
     }
 
     /* =========================
@@ -245,7 +267,7 @@ class DiagnosticServicePJ
         return match (true) {
             $avg >= 85 => "<b>Liderança e Robustez:</b> Sua empresa apresenta uma maturidade financeira de mercado. O foco agora é eficiência tributária e expansão de mercado.",
             $avg >= 70 => "<b>Prontidão para Escala:</b> O negócio está saudável e equilibrado. É o momento de ajustar os processos para crescer sem perder a lucratividade.",
-            $avg >= 50 => "<b>Estabilidade Operacional:</b> A empresa sobrevive bem, mas ainda 'apaga incêndios'. Faltam indicadores para você ter liberdade como dono.",
+            $avg >= 50 => "<b>Estabilidade Operacional:</b> A empresa sobrevive, mas ainda 'apaga incêndios'. Faltam indicadores para você ter liberdade como dono.",
             $avg >= 30 => "<b>Alerta de Gestão:</b> Existem gargalos que estão limitando o potencial do negócio. É hora de profissionalizar o financeiro para evitar estagnação.",
             default    => "<b>Risco de Continuidade:</b> O negócio precisa de uma reestruturação financeira imediata para garantir a operação e proteger o seu patrimônio."
         };
@@ -271,19 +293,6 @@ class DiagnosticServicePJ
        HELPERS
     ========================== */
 
-    private function calculateCategoryScores($options)
-    {
-        return $options->groupBy('question.category.name')->map(function ($items) {
-            $score = $items->sum('points');
-            $max   = $items->count() * 3;
-            return [
-                'name'    => $items->first()->question->category->name,
-                'score'   => $score,
-                'max'     => $max,
-                'percent' => ($score / $max) * 100,
-            ];
-        });
-    }
 
     private function resolveLevel(float $percent): string
     {

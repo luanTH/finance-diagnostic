@@ -14,6 +14,8 @@ use App\Services\DiagnosticServicePF;
 use App\Services\DiagnosticServicePJ;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Mail;
+use App\Rules\Recaptcha;
+use Illuminate\Validation\Rule;
 
 class DiagnosticController extends Controller
 {
@@ -44,6 +46,20 @@ class DiagnosticController extends Controller
 
     public function store(Request $request)
     {
+        $validated = $request->validate([
+            // Validação do Lead
+            'lead.name' => ['required', 'string', 'min:3', 'max:255'],
+            'lead.email' => ['required', 'email:rfc,dns'], // Valida formato e existência do domínio
+            'lead.phone' => ['required', 'string', 'min:14', 'max:15'], // Valida a máscara (00) 00000-0000
+            'lead.type' => ['required', Rule::in(['pf', 'pj'])], // Garante que o tipo seja um dos dois permitidos
+            'lead.consent' => ['required', 'accepted'], // Garante que o checkbox foi marcado (true/1/on)
+            'lead.captcha_token' => ['required', new Recaptcha],
+
+            // Validação das Respostas
+            'answers' => ['required', 'array', 'min:1'], // Garante que é um array e não está vazio
+            'answers.*' => ['required', 'integer', 'exists:options,id'], // Garante que cada opção selecionada existe no banco
+        ]);
+
         return DB::transaction(function () use ($request) {
             // 1. Salva ou atualiza o Lead
             $lead = Lead::updateOrCreate(

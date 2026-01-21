@@ -11,8 +11,8 @@ class DiagnosticServicePF
     const LEVEL_AVERAGE = 'average';
     const LEVEL_WEAK    = 'weak';
 
-    private int $thresholdStrong = 70; // Ajustado para ser mais criterioso
-    private int $thresholdWeak   = 40;
+    private int $thresholdStrong = 75;
+    private int $thresholdWeak   = 45;
 
     public function generate(array $selectedOptionIds): array
     {
@@ -23,19 +23,22 @@ class DiagnosticServicePF
         $categoryScores = $this->calculateCategoryScores($options);
         $totalScore     = $options->sum('points');
 
-        // Filtros de Nível
-        $strengths   = $categoryScores->filter(fn($c) => $c['percent'] >= $this->thresholdStrong);
-        $weaknesses  = $categoryScores->filter(fn($c) => $c['percent'] <= $this->thresholdWeak);
-        $priorities  = $categoryScores->filter(fn($c) => $c['percent'] < $this->thresholdStrong);
+        // 1. Separação dos grupos por nível de pontuação
+        $strongCats  = $categoryScores->filter(fn($c) => $c['percent'] >= $this->thresholdStrong);
+        $weakCats    = $categoryScores->filter(fn($c) => $c['percent'] <= $this->thresholdWeak);
+        $averageCats = $categoryScores->filter(
+            fn($c) =>
+            $c['percent'] > $this->thresholdWeak && $c['percent'] < $this->thresholdStrong
+        );
 
         return [
             'tipo'                     => 'pf',
             'frase_atual'              => $this->getCurrentSituationPhrase($categoryScores),
 
-            // Usando os termos exatos que você solicitou
-            'pontos_fortes'            => $this->mapExactPoints($strengths, 'strong'),
-            'pontos_desenvolver'       => $this->mapExactPoints($weaknesses, 'weak'),
-            'pontos_melhorar'    => $this->mapPriorities($priorities),
+            // Retornos com os termos exatos solicitados
+            'pontos_fortes'            => $this->mapToExactPhrases($strongCats, 'strong'),
+            'pontos_melhorar'    => $this->mapToExactPhrases($weakCats, 'priority'),
+            'pontos_desenvolver'     => $this->mapToExactPhrases($averageCats, 'develop'),
 
             'diagnosticos_especificos' => $this->getSpecificDiagnostics($categoryScores),
             'geral'                    => $this->getGeneralSolution($categoryScores),
@@ -44,64 +47,64 @@ class DiagnosticServicePF
     }
 
     /**
-     * MAPEAMENTO DE PONTOS EXATOS (PF)
-     * Transforma categorias em seus termos técnicos correspondentes
+     * Mapeamento Centralizado de Frases Técnicas
      */
-    private function mapExactPoints(Collection $categories, string $level): array
+    private function mapToExactPhrases(Collection $categories, string $bucket): array
     {
         $map = [
             'strong' => [
-                'Fluxo de Caixa e Organização'  => ['Gasta menos do que ganha', 'Organização financeira'],
-                'Capacidade de Poupança e Reserva' => ['Alto potencial de poupar', 'Alta Liquidez Patrimonial'],
+                'Fluxo de Caixa e Organização'      => ['Gasta menos do que ganha', 'Organização financeira'],
+                'Capacidade de Poupança e Reserva'  => ['Alto potencial de poupar', 'Alta Liquidez Patrimonial'],
                 'Perfil e Experiência em Investimentos' => ['Experiência com investimentos'],
-                'Proteção e Gestão de Riscos'   => ['Boa cobertura de riscos'],
-                'Patrimônio e Sucessão'         => ['Acumulo Patrimonial'],
-                'Projetos e Objetivos de Vida'  => ['Pouco Fluxo de Projetos', 'Baixo Valor de Projetos'],
-                'Consistência e Educação'       => ['Educação financeira'],
+                'Proteção e Gestão de Riscos'       => ['Boa cobertura de riscos'],
+                'Patrimônio e Sucessão'             => ['Acumulo Patrimonial'],
+                'Projetos e Objetivos de Vida'      => ['Pouco Fluxo de Projetos', 'Baixo Valor de Projetos'],
+                'Consistência e Educação'           => ['Educação financeira'],
             ],
-            'weak' => [
-                'Fluxo de Caixa e Organização'  => ['Gasta mais do que ganha', 'Desorganização financeira'],
-                'Capacidade de Poupança e Reserva' => ['Sem capacidade de poupar'],
+            'develop' => [
+                'Fluxo de Caixa e Organização'      => ['Gasta mais do que ganha', 'Desorganização financeira'],
+                'Capacidade de Poupança e Reserva'  => ['Sem capacidade de poupar'],
                 'Perfil e Experiência em Investimentos' => ['Baixa experiência com investimentos', 'Carteira de Investimento Inadequada'],
-                'Proteção e Gestão de Riscos'   => ['Baixa cobertura de riscos'],
-                'Patrimônio e Sucessão'         => ['Baixo Acumulo Patrimonial'],
-                'Projetos e Objetivos de Vida'  => ['Muito Fluxo de Projetos', 'Alto Valor dos Projetos'],
+                'Proteção e Gestão de Riscos'       => ['Baixa cobertura de riscos'],
+                'Patrimônio e Sucessão'             => ['Baixo Acumulo Patrimonial'],
+                'Projetos e Objetivos de Vida'      => ['Muito Fluxo de Projetos', 'Alto Valor dos Projetos'],
+            ],
+            'priority' => [
+                'Fluxo de Caixa e Organização'      => ['Organização do Orçamento e fluxo de caixa'],
+                'Gestão de Dívidas'                 => ['Quitação de Dividas'],
+                'Patrimônio e Sucessão'             => ['Realocação Patrimonial', 'Planejamento Tributário', 'Planejamento Sucessório'],
+                'Capacidade de Poupança e Reserva'  => ['Acúmulo Patrimonial'],
+                'Consistência e Educação'           => ['Educação Financeira'],
+                'Perfil e Experiência em Investimentos' => ['Educação Financeira'],
+                'Aposentadoria e Longevidade'       => ['Planejamento da Aposentadoria'],
+                'Proteção e Gestão de Riscos'       => ['Proteção Familiar e cobertura de Riscos'],
             ]
         ];
 
         $results = [];
         foreach ($categories as $cat) {
-            if (isset($map[$level][$cat['name']])) {
-                foreach ($map[$level][$cat['name']] as $point) {
-                    $results[] = $point;
+            if (isset($map[$bucket][$cat['name']])) {
+                foreach ($map[$bucket][$cat['name']] as $phrase) {
+                    $results[] = $phrase;
                 }
             }
         }
 
-        return array_unique($results);
+        return array_values(array_unique($results));
     }
 
-    /**
-     * MAPEAMENTO DE ÊNFASES DE PRIORIDADE
-     */
-    private function mapPriorities(Collection $categories): array
+    private function calculateCategoryScores($options)
     {
-        $priorityMap = [
-            'Fluxo de Caixa e Organização'  => 'Organização do Orçamento e fluxo de caixa',
-            'Capacidade de Poupança e Reserva' => 'Acúmulo Patrimonial',
-            'Perfil e Experiência em Investimentos' => 'Educação Financeira',
-            'Aposentadoria e Longevidade'   => 'Planejamento da Aposentadoria',
-            'Gestão de Dívidas'             => 'Quitação de Dividas',
-            'Proteção e Gestão de Riscos'   => 'Proteção Familiar e cobertura de Riscos',
-            'Patrimônio e Sucessão'         => 'Planejamento Sucessório', // Poderia incluir Tributário/Realocação
-            'Consistência e Educação'       => 'Educação Financeira',
-        ];
-
-        return $categories->map(fn($c) => $priorityMap[$c['name']] ?? null)
-            ->filter()
-            ->unique()
-            ->values()
-            ->all();
+        return $options->groupBy('question.category.name')->map(function ($items) {
+            $score = $items->sum('points');
+            $max   = $items->count() * 3;
+            return [
+                'name'    => $items->first()->question->category->name,
+                'score'   => $score,
+                'max'     => $max,
+                'percent' => ($score / $max) * 100,
+            ];
+        });
     }
 
     /* =========================
@@ -223,27 +226,6 @@ class DiagnosticServicePF
                 'Consistência e Educação' => ['A falta de educação financeira básica impede você de enxergar riscos e oportunidades reais.'],
             ],
         ];
-    }
-
-    /* =========================
-       CÁLCULO E HELPERS
-    ========================== */
-
-    private function calculateCategoryScores($options)
-    {
-        return $options
-            ->groupBy('question.category.name')
-            ->map(function ($items) {
-                $score = $items->sum('points');
-                $max   = $items->count() * 3;
-
-                return [
-                    'name'    => $items->first()->question->category->name,
-                    'score'   => $score,
-                    'max'     => $max,
-                    'percent' => ($score / $max) * 100,
-                ];
-            });
     }
 
     private function resolveLevel(float $percent): string

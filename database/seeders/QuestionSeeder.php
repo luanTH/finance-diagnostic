@@ -127,14 +127,14 @@ class QuestionSeeder extends Seeder
 
             'Projetos e Objetivos de Vida' => [
                 'Quantas metas de alto valor você planeja realizar nos próximos 2 anos?' => [
-                    'Muitas metas sem capital provisionado' => 1,      // -> Muito Fluxo de Projetos
-                    'Algumas metas com planejamento em andamento' => 2,
+                    'Muitas metas, mas ainda sem capital provisionado' => 1,      // -> Muito Fluxo de Projetos
+                    'Algumas metas, com planejamento em andamento' => 2,
                     'Poucas metas ou todas já devidamente provisionadas' => 3,         // -> Pouco Fluxo de Projetos
                 ],
                 'Qual o valor total estimado dos seus projetos de curto prazo em relação à sua renda?' => [
-                    'Um valor muito alto que exige grande esforço ou dívida' => 1, // -> Alto Valor dos Projetos
+                    'Um valor que exige grande esforço ou dívida' => 1, // -> Alto Valor dos Projetos
                     'Um valor desafiador, mas dentro do fluxo normal' => 2,
-                    'Um valor baixo que não impacta o patrimônio consolidado' => 3,    // -> Baixo Valor de Projetos
+                    'Um valor que não impacta o patrimônio consolidado' => 3,    // -> Baixo Valor de Projetos
                 ],
             ],
 
@@ -144,7 +144,7 @@ class QuestionSeeder extends Seeder
                     'Leio de forma esporádica' => 2,
                     'Acompanho ativamente e busco constante aprendizado' => 3, // -> Educação financeira
                 ],
-                'O que você faz quando recebe uma renda extra significativa (bônus/herança/venda de bem)?' => [
+                'O que você faz quando recebe uma renda extra significativa?' => [
                     'Gasto com desejos imediatos ou quitação de imprevistos' => 1,
                     'Utilizo parte para o consumo e guardo o restante' => 2,
                     'Direciono 100% conforme meu planejamento estratégico' => 3,

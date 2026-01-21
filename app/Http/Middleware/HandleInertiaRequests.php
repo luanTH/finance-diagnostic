@@ -35,9 +35,8 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        return [
-            ...parent::share($request),
-            //
-        ];
+        return array_merge(parent::share($request), [
+            'recaptcha_site_key' => env('RECAPTCHA_SITE_KEY'),
+        ]);
     }
 }
