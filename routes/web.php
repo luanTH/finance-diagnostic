@@ -20,7 +20,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 });
 
 Route::get('/', [DiagnosticController::class, 'index'])->name('diagnostic.index');
-Route::get('/pj', [DiagnosticController::class, 'index'])->name('diagnostic.index');
+Route::get('/pj', [DiagnosticController::class, 'index'])->name('diagnostic.indexPj');
 Route::prefix('diagnostico')->group(function () {
     Route::post('/enviar', [DiagnosticController::class, 'store'])->name('diagnostic.store');
 });

@@ -20,7 +20,7 @@ defineProps({ lead: Object });
                         <div class="flex flex-wrap gap-4 text-slate-500">
                             <span class="flex items-center gap-1"><Mail class="w-4 h-4" /> {{ lead.email }}</span>
                             <span class="flex items-center gap-1"><Phone class="w-4 h-4" /> {{ lead.phone }}</span>
-                            <span class="flex items-center gap-1"><Calendar class="w-4 h-4" /> {{ new Date(lead.created_at).toLocaleDateString() }}</span>
+                            <span class="flex items-center gap-1"><Calendar class="w-4 h-4" /> {{ new Date(lead.created_at).toLocaleDateString() }} às {{ new Date(lead.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }}</span>
                         </div>
                     </div>
                 </div>

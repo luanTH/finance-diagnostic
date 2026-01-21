@@ -6,16 +6,19 @@ use App\Models\Answer;
 use App\Models\Diagnosis;
 use App\Models\Lead;
 use App\Models\Question;
-use App\Services\DiagnosticService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use App\Mail\DiagnosticReportMail;
+use App\Services\DiagnosticServicePF;
+use App\Services\DiagnosticServicePJ;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Mail;
 
 class DiagnosticController extends Controller
 {
+    public function __construct(private DiagnosticServicePF $servicePF, private DiagnosticServicePJ $servicePJ) {}
+
     public function index(Request $request)
     {
         $type = str_ends_with($request->url(), '/pj') ? 'pj' : 'pf';
@@ -39,9 +42,9 @@ class DiagnosticController extends Controller
         ]);
     }
 
-    public function store(Request $request, DiagnosticService $service)
+    public function store(Request $request)
     {
-        return DB::transaction(function () use ($request, $service) {
+        return DB::transaction(function () use ($request) {
             // 1. Salva ou atualiza o Lead
             $lead = Lead::updateOrCreate(
                 ['email' => $request->lead['email']],
@@ -61,8 +64,11 @@ class DiagnosticController extends Controller
                 ]);
             }
 
-            // 3. Gera o Diagnóstico Inteligente
-            $report = $service->generate($request->answers, $lead->type);
+            if ($lead->type == 'pf') {
+                $report = $this->servicePF->generate($request->answers, $lead->type);
+            } else {
+                $report = $this->servicePJ->generate($request->answers, $lead->type);
+            }
 
             // 4. Salva o registro do diagnóstico
             $diagnostic = Diagnosis::create([
@@ -99,17 +105,18 @@ class DiagnosticController extends Controller
         ]);
     }
 
-    public function pdfView(int $id, DiagnosticService $service)
+    public function pdfView(int $id)
     {
         $lead = Lead::with(['answers.question.category', 'answers.option'])->findOrFail($id);
 
         // 2. Extrai apenas os IDs das opções selecionadas para o serviço
         $optionIds = $lead->answers->pluck('option_id')->toArray();
 
-        // 3. Gera o diagnóstico usando a nova lógica
-        $report = $service->generate($optionIds, $lead->type);
-
-        // dd($report);
+        if ($lead->type == 'pf') {
+            $report = $this->servicePF->generate($optionIds, $lead->type);
+        } else {
+            $report = $this->servicePJ->generate($optionIds, $lead->type);
+        }
 
         // 4. Renderiza o PDF para visualização no navegador (stream)
         return Pdf::loadView('pdf.diagnostic', compact('lead', 'report'))
@@ -117,15 +124,18 @@ class DiagnosticController extends Controller
             ->stream("diagnostico_{$lead->name}.pdf");
     }
 
-    public function reenviarEmail(int $id, DiagnosticService $service)
+    public function reenviarEmail(int $id)
     {
         $lead = Lead::with(['answers.question.category', 'answers.option'])->findOrFail($id);
 
         // 2. Extrai apenas os IDs das opções selecionadas para o serviço
         $optionIds = $lead->answers->pluck('option_id')->toArray();
 
-        // 3. Gera o diagnóstico usando a nova lógica
-        $report = $service->generate($optionIds, $lead->type);
+        if ($lead->type == 'pf') {
+            $report = $this->servicePF->generate($optionIds, $lead->type);
+        } else {
+            $report = $this->servicePJ->generate($optionIds, $lead->type);
+        }
 
         $lead->load(['answers.question.category', 'answers.option']);
 

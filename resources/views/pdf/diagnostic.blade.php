@@ -29,7 +29,7 @@
             text-align: center;
             border-radius: 0 8px 8px 0;
         }
-        .intro-phrase-text { font-size: 14px; font-weight: bold; color: #1e1b4b; font-style: italic; }
+        .intro-phrase-text { font-size: 14px; color: #1e1b4b; font-style: italic; }
 
         .section-title { font-size: 13px; font-weight: bold; margin-top: 25px; margin-bottom: 10px; color: #1e293b; text-transform: uppercase; border-bottom: 2px solid #f1f5f9; padding-bottom: 3px; }
 
@@ -45,45 +45,82 @@
         .p-action { font-size: 10px; font-weight: bold; color: #4f46e5; }
 
         /* NOVO DESIGN: Veredicto / Conclusão */
-        .veredicto-container {
-            margin-top: 30px;
-            padding: 20px;
-            background: linear-gradient(to right, #ffffff, #f8fafc);
-            border: 1px solid #e2e8f0;
-            border-left: 5px solid #0f172a;
-            border-radius: 8px;
-        }
-        .veredicto-header { color: #4f46e5; font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-        .veredicto-content { font-size: 13px; color: #1e293b; line-height: 1.6; font-weight: 500; }
+        .section-divider {
+        border-top: 1px solid #e2e8f0;
+        margin: 40px 0;
+        width: 100%;
+    }
 
-        /* SEÇÃO DE CHAMADA PARA AÇÃO (CTA) */
-        .cta-section {
-            margin-top: 40px;
-            text-align: center;
-            padding: 30px;
-            background-color: #fdfeff;
-            border: 2px dashed #cbd5e1;
-            border-radius: 15px;
-        }
-        .cta-title { font-size: 16px; font-weight: bold; color: #4f46e5; margin-bottom: 10px; }
-        .cta-text { font-size: 12px; color: #475569; margin-bottom: 15px; }
-        .cta-button {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #4f46e5;
-            color: #ffffff;
-            text-decoration: none;
-            font-weight: bold;
-            border-radius: 5px;
-            font-size: 12px;
-        }
+    /* CONCLUSÃO ESTRATÉGICA - Visual de Resumo Executivo */
+    .veredicto-container {
+        margin-top: 20px;
+        margin-bottom: 30px;
+        padding: 20px;
+        border: 1px solid #065f46;
+        border-radius: 4px;
+        position: relative;
+    }
+
+    .veredicto-header {
+        position: absolute;
+        top: -12px;
+        left: 20px;
+        background: #ffffff;
+        padding: 0 10px;
+        font-size: 12px;
+        text-transform: uppercase;
+        font-weight: bold;
+        color: #065f46;
+    }
+
+    .veredicto-content {
+        font-size: 13px;
+        line-height: 1.6;
+        color: #1e293b;
+        text-align: center;
+        font-style: italic; /* Diferencia da frase inicial do topo */
+    }
+
+    /* CTA - Focado em Espaço e Botão */
+    .cta-container {
+        page-break-inside: avoid;
+        text-align: center;
+        padding: 20px 0;
+    }
+
+    .cta-title {
+        font-size: 18px;
+        font-weight: bold;
+        color: #4f46e5;
+        margin-bottom: 15px;
+    }
+
+    .cta-text {
+        font-size: 13px;
+        color: #64748b;
+        max-width: 80%;
+        margin: 0 auto 25px auto;
+        line-height: 1.5;
+    }
+
+    .cta-button {
+        display: inline-block;
+        padding: 14px 35px;
+        background-color: #4f46e5;
+        color: #ffffff;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 13px;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
 
         .page-break { page-break-before: always; }
     </style>
 </head>
 <body>
 
-    <div class="header">RELATÓRIO FINANCEIRO | {{ $lead->name }}</div>
+    <div class="header">RELATÓRIO FINANCEIRO {{$lead->type == 'pf' ? " PF " : " PJ "}} | {{ $lead->name }}</div>
 
     <div class="footer">
         <strong>Plannfinn Family Office Negócios e Finanças</strong><br>
@@ -104,22 +141,23 @@
     </div>
 
     <div class="intro-phrase-box">
-        <span class="intro-phrase-text">"{{ $report['frase_atual'] }}"</span>
+        <span class="intro-phrase-text">"{!! $report['frase_atual'] !!}"</span>
     </div>
 
     <div class="section-title">Resumo de Performance</div>
 
+
     <div class="card card-strong">
-        <strong style="font-size: 12px;"><span>&#10003;</span> Seus Pontos Fortes</strong>
+        <strong style="font-size: 12px;"><span>&#10003;</span> PONTOS FORTES</strong>
         <ul style="margin: 8px 0 0 15px; padding: 0;">
             @foreach($report['pontos_fortes'] as $ponto)
-                <li style="margin-bottom: 5px;">{!! $ponto !!}</li>
+            <li style="margin-bottom: 5px;">{!! $ponto !!}</li>
             @endforeach
         </ul>
     </div>
 
     <div class="card card-weak">
-        <strong style="font-size: 12px;">⚠️ Pontos de Atenção</strong>
+        <strong style="font-size: 12px;">⚠️ ÊNFASES DE PRIORIDADES</strong>
         <ul style="margin: 8px 0 0 15px; padding: 0;">
             @foreach($report['pontos_desenvolver'] as $ponto)
                 <li style="margin-bottom: 5px;">{!! $ponto !!}</li>
@@ -130,7 +168,7 @@
     @if(count($report['pontos_melhorar']) > 0)
         <div class="card" style="background-color: #fffbeb; color: #92400e; border: 1px solid #fef3c7; margin-bottom: 10px;">
             <div style="display: block; margin-bottom: 8px;">
-                <strong style="font-size: 12px; color: #92400e;"> ➔ Oportunidades de Melhoria</strong>
+                <strong style="font-size: 12px; color: #92400e;"> ➔ PONTOS A DESENVOLVER</strong>
             </div>
             <ul style="margin: 5px 0 0 25px; padding: 0; list-style-type: none;">
                 @foreach($report['pontos_melhorar'] as $ponto)
@@ -166,22 +204,34 @@
         </tbody>
     </table>
 
-    <div class="veredicto-container">
-        <div class="veredicto-header">Conclusão Estratégica</div>
-        <div class="veredicto-content">
-            {{ $report['geral'] }}
-        </div>
+<div class="veredicto-container">
+    <div class="veredicto-header">Veredito Estratégico</div>
+    <div class="veredicto-content">
+        {!! $report['geral'] !!}
     </div>
+</div>
 
-    <div class="cta-section">
-        <div class="cta-title">Qual o próximo passo para sua liberdade?</div>
+<div class="cta-container">
+    @if($lead->type === 'pj')
+        {{-- Versão PJ --}}
+        <div class="cta-title">Como levar sua empresa ao próximo nível?</div>
         <p class="cta-text">
-            Este diagnóstico é apenas o primeiro passo. Um <strong>Planejamento Financeiro Completo</strong> organiza seus investimentos, protege seu patrimônio e acelera sua independência.
+            Este diagnóstico é o ponto de partida. O <strong>Planejamento Financeiro Empresarial</strong> é o que separa empresas que apenas sobrevivem daquelas que escalam com lucro real.
+        </p>
+        <a href="https://wa.me/5598984068970?text=Olá! Gostaria de falar sobre o Planejamento Estratégico para minha empresa." class="cta-button">
+            Falar com um Consultor de Empresas
+        </a>
+    @else
+        {{-- Versão PF --}}
+        <div class="cta-title">O que falta para sua liberdade financeira?</div>
+        <p class="cta-text">
+            Um diagnóstico sem ação é apenas papel. O <strong>Planejamento Completo</strong> é o mapa que organiza seus investimentos e protege o futuro da sua família.
         </p>
         <a href="https://wa.me/5598984068970?text=Olá! Gostaria de saber mais sobre o Planejamento Financeiro Completo." class="cta-button">
-            Quero meu Planejamento Completo
+            Quero meu Planejamento Personalizado
         </a>
-    </div>
+    @endif
+</div>
 
     <div class="page-break"></div>
 

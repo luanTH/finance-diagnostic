@@ -61,6 +61,7 @@ console.log('leads', props.leads.links)
                                 <td class="p-6">
                                     <div class="font-bold text-slate-800">{{ lead.name }}</div>
                                     <div class="text-sm text-slate-500">{{ lead.email }}</div>
+                                    <div class="text-sm text-slate-500">{{ lead.phone }}</div>
                                 </td>
                                 <td class="p-6">
                                     <span :class="lead.type === 'pf' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'" class="px-3 py-1 rounded-full text-xs font-black uppercase">

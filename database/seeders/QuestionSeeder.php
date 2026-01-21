@@ -19,133 +19,135 @@ class QuestionSeeder extends Seeder
     public function run()
     {
         $dataPF = [
-            'Organização Financeira' => [
-                'Você controla suas finanças de alguma forma?' => [
-                    'Não faço nenhum controle' => 1,
-                    'Controle informal ou esporádico' => 2,
-                    'Uso app, planilha ou sistema' => 3,
+            'Fluxo de Caixa e Organização' => [
+                'Qual frase melhor descreve o fechamento do seu mês financeiro?' => [
+                    'Gasto mais do que ganho e entro no crédito/cheque especial' => 1, // -> Gasta mais do que ganha
+                    'Gasto tudo o que ganho, não sobra nada (equilíbrio no zero)' => 2, // -> Sem capacidade de poupar
+                    'Gasto menos do que ganho e sempre sobra para investir' => 3,     // -> Gasta menos do que ganha
                 ],
-                'Você sabe exatamente quanto ganha por mês?' => [
-                    'Não sei ao certo' => 1,
-                    'Tenho uma estimativa' => 2,
-                    'Sei exatamente' => 3,
+                'Como você realiza o acompanhamento e o registro da sua vida financeira hoje?' => [
+                    'Não utilizo nenhuma ferramenta ou acompanhamento' => 1,          // -> Desorganização financeira
+                    'Acompanho apenas pelo extrato bancário ou anotações vagas' => 2,
+                    'Utilizo ferramentas dedicadas como planilhas, apps ou sistemas' => 3, // -> Organização financeira
                 ],
-            ],
-
-            'Consciência de Gastos' => [
-                'Você sabe para onde vai a maior parte do seu dinheiro?' => [
-                    'Não faço ideia' => 1,
-                    'Tenho uma noção geral' => 2,
-                    'Tenho total clareza' => 3,
+                'Qual o nível de detalhamento do seu controle de gastos diários?' => [
+                    'Não faço ideia para onde o dinheiro vai' => 1,
+                    'Tenho uma noção geral, mas sem categorização clara' => 2,
+                    'Registro e categorizo 100% das minhas entradas e saídas' => 3,
                 ],
-                'Você revisa seus gastos mensalmente?' => [
-                    'Nunca' => 1,
-                    'Às vezes' => 2,
-                    'Todo mês' => 3,
+                'Com que frequência você utiliza o cartão de crédito para despesas básicas (mercado/contas)?' => [
+                    'Sempre, e muitas vezes parcelo a fatura ou pago o mínimo' => 1, // -> Quitação de Dívidas (Prioridade)
+                    'Uso para acumular pontos, mas às vezes perco o controle' => 2,
+                    'Uso estrategicamente e pago sempre o valor integral' => 3,
                 ],
             ],
 
-            'Controle de Dívidas' => [
-                'Quanto da sua renda está comprometida com dívidas?' => [
-                    'Mais de 50%' => 1,
-                    'Entre 20% e 50%' => 2,
-                    'Menos de 20% ou nada' => 3,
+            'Capacidade de Poupança e Reserva' => [
+                'Atualmente, qual percentual da sua renda líquida você consegue poupar?' => [
+                    '0% (Não consigo poupar nada)' => 1,                  // -> Sem capacidade de poupar
+                    'Entre 5% e 15%' => 2,                                // -> Baixo potencial de poupar
+                    'Acima de 20% da minha renda' => 3,                   // -> Alto potencial de poupar
                 ],
-                'Você depende de crédito para fechar o mês?' => [
-                    'Sempre' => 1,
-                    'Às vezes' => 2,
-                    'Raramente ou nunca' => 3,
-                ],
-            ],
-
-            'Reserva e Segurança' => [
-                'Você possui reserva de emergência?' => [
-                    'Não possuo' => 1,
-                    'Tenho menos de 3 meses' => 2,
-                    'Tenho 6 meses ou mais' => 3,
-                ],
-                'Se perdesse sua renda hoje, por quanto tempo sobreviveria?' => [
-                    'Menos de 1 mês' => 1,
-                    'De 1 a 3 meses' => 2,
-                    'Mais de 6 meses' => 3,
+                'Se sua principal fonte de renda parasse hoje, por quanto tempo sua reserva manteria seu padrão?' => [
+                    'Menos de 1 mês (Sobrevivência imediata em risco)' => 1, // -> Baixa Liquidez
+                    'De 3 a 5 meses (Reserva em formação)' => 2,
+                    'Mais de 6 meses (Reserva de emergência sólida)' => 3,   // -> Alta Liquidez Patrimonial
                 ],
             ],
 
-            'Planejamento' => [
-                'Você possui metas financeiras definidas?' => [
-                    'Não tenho metas' => 1,
-                    'Tenho metas vagas' => 2,
-                    'Tenho metas claras e escritas' => 3,
+            'Perfil e Experiência em Investimentos' => [
+                'Onde está concentrada a maior parte do seu dinheiro hoje?' => [
+                    'Apenas na Poupança ou conta corrente' => 1,             // -> Baixa experiência com investimentos
+                    'CDBs, Tesouro Direto ou Previdência Privada' => 2,      // -> Experiência básica
+                    'Ações (Bolsa de Valores), FIIs ou Criptoativos' => 3,  // -> Experiência com investimentos
                 ],
-                'Você planeja seus gastos futuros?' => [
-                    'Não planejo' => 1,
-                    'Planejo parcialmente' => 2,
-                    'Planejo com antecedência' => 3,
+                'Qual o seu nível de conhecimento sobre o mercado financeiro?' => [
+                    'Totalmente leigo, não entendo as siglas e produtos' => 1,         // -> Educação Financeira (Prioridade)
+                    'Entendo o básico de Renda Fixa e títulos públicos' => 2,
+                    'Domino análise de ativos e diversificação de risco' => 3, // -> Educação financeira (Ponto forte)
                 ],
-            ],
-
-            'Mentalidade Financeira' => [
-                'Como você toma decisões financeiras importantes?' => [
-                    'Por impulso ou emoção' => 1,
-                    'Analiso um pouco antes' => 2,
-                    'Analiso com estratégia' => 3,
-                ],
-                'Você se sente no controle da sua vida financeira?' => [
-                    'Não, me sinto perdido' => 1,
-                    'Às vezes no controle' => 2,
-                    'Sim, totalmente no controle' => 3,
+                'Você sente que sua carteira de investimentos atual está correta para seus objetivos?' => [
+                    'Não sei avaliar (Provavelmente inadequada)' => 1,      // -> Carteira de Investimento Inadequada
+                    'Sinto que poderia render mais ou ser mais segura' => 2,
+                    'Sim, está otimizada e revisada constantemente' => 3,
                 ],
             ],
 
-            'Crescimento e Futuro' => [
-                'Você investe pensando no longo prazo?' => [
-                    'Não invisto' => 1,
-                    'Invisto sem estratégia' => 2,
-                    'Invisto com foco no futuro' => 3,
+            'Aposentadoria e Longevidade' => [
+                'Qual a sua estratégia atual para garantir sua renda na terceira idade?' => [
+                    'Conto apenas com o INSS/Previdência Social' => 1,      // -> Planejamento da Aposentadoria (Prioridade)
+                    'Tenho uma reserva, mas sem cálculo de rentabilidade futura' => 2,
+                    'Possuo ativos geradores de renda passiva (aluguel/dividendos)' => 3,
                 ],
-                'Você busca aumentar sua renda?' => [
-                    'Não penso nisso' => 1,
-                    'Penso, mas não ajo' => 2,
-                    'Busco ativamente' => 3,
-                ],
-            ],
-
-            'Proteção Financeira' => [
-                'Você possui seguros adequados à sua realidade (vida, saúde, patrimônio)?' => [
-                    'Não possuo nenhum seguro' => 1,
-                    'Possuo alguns, mas sem revisão' => 2,
-                    'Tenho seguros adequados e revisados' => 3,
-                ],
-                'Você já passou por um imprevisto financeiro grave nos últimos anos?' => [
-                    'Sim, e não estava preparado' => 1,
-                    'Sim, mas consegui lidar' => 2,
-                    'Não, estou bem protegido' => 3,
+                'Você sabe exatamente quanto precisa ter acumulado para parar de trabalhar?' => [
+                    'Não tenho a menor ideia do valor necessário' => 1,
+                    'Tenho uma estimativa vaga' => 2,
+                    'Sim, tenho o cálculo da minha independência financeira' => 3,
                 ],
             ],
 
-            'Eficiência Financeira' => [
-                'Você sente que seu dinheiro rende pouco em relação ao esforço que faz?' => [
-                    'Sim, parece que nunca é suficiente' => 1,
-                    'Às vezes sinto isso' => 2,
-                    'Não, meu dinheiro é bem direcionado' => 3,
-                ],
-                'Você revisa contratos, taxas e serviços financeiros que utiliza?' => [
-                    'Nunca reviso' => 1,
-                    'Reviso raramente' => 2,
-                    'Reviso e otimizo regularmente' => 3,
+            'Gestão de Dívidas' => [
+                'Qual o peso das parcelas de dívidas (empréstimos/financiamentos) no seu orçamento?' => [
+                    'Compromete mais de 30% da minha renda' => 1,          // -> Quitação de Dívidas
+                    'Compromete entre 10% e 30%' => 2,
+                    'Não possuo dívidas ou comprometimento irrelevante' => 3,
                 ],
             ],
 
-            'Disciplina e Consistência' => [
-                'Você consegue manter hábitos financeiros saudáveis por longos períodos?' => [
-                    'Não, sempre abandono' => 1,
-                    'Consigo por algum tempo' => 2,
-                    'Sim, é parte da minha rotina' => 3,
+            'Proteção e Gestão de Riscos' => [
+                'No caso de um imprevisto grave de saúde ou necessidade de ausência profissional, como ficaria o equilíbrio financeiro da sua família?' => [
+                    'Impacto devastador (não temos proteção estruturada)' => 1, // -> Baixa cobertura de riscos
+                    'Impacto moderado (conseguiríamos lidar por pouco tempo)' => 2,
+                    'Baixo impacto (temos coberturas e seguros adequados)' => 3, // -> Boa cobertura de riscos
                 ],
-                'Quando surge uma renda extra, você costuma:' => [
-                    'Gastar sem planejamento' => 1,
-                    'Dividir entre gasto e responsabilidade' => 2,
-                    'Direcionar com estratégia' => 3,
+                'Seus seguros e ferramentas de proteção são revisados anualmente por um especialista?' => [
+                    'Nunca revisei ou não possuo proteção' => 1,                    // -> Proteção Familiar e cobertura de Riscos
+                    'Reviso apenas pontualmente' => 2,
+                    'Reviso estrategicamente conforme meu patrimônio evolui' => 3,
+                ],
+            ],
+
+            'Patrimônio e Sucessão' => [
+                'Como está a divisão do seu patrimônio entre bens imóveis e bens financeiros?' => [
+                    'Quase tudo em imóveis/carros (Baixa liquidez)' => 1,  // -> Realocação Patrimonial (Prioridade)
+                    'Equilíbrio entre bens de uso e investimentos' => 2,
+                    'Maior parte em ativos financeiros com boa liquidez' => 3,     // -> Acumulo Patrimonial
+                ],
+                'Você já possui uma estratégia formalizada para a sucessão do seu patrimônio aos herdeiros?' => [
+                    'Não possuo nenhuma estratégia (vai para inventário)' => 1,             // -> Planejamento Sucessório (Prioridade)
+                    'Já tratei sobre o assunto, mas não formalizei legalmente' => 2,
+                    'Já possuo estrutura jurídica e sucessória montada' => 3,
+                ],
+                'Você busca formas de otimizar legalmente o pagamento de impostos sobre seus bens e rendimentos?' => [
+                    'Não faço nenhum tipo de planejamento tributário' => 1,        // -> Planejamento Tributário (Prioridade)
+                    'Busco apenas a declaração completa, mas sem estratégia' => 2,
+                    'Faço planejamento tributário recorrente com especialistas' => 3,
+                ],
+            ],
+
+            'Projetos e Objetivos de Vida' => [
+                'Quantas metas de alto valor você planeja realizar nos próximos 2 anos?' => [
+                    'Muitas metas sem capital provisionado' => 1,      // -> Muito Fluxo de Projetos
+                    'Algumas metas com planejamento em andamento' => 2,
+                    'Poucas metas ou todas já devidamente provisionadas' => 3,         // -> Pouco Fluxo de Projetos
+                ],
+                'Qual o valor total estimado dos seus projetos de curto prazo em relação à sua renda?' => [
+                    'Um valor muito alto que exige grande esforço ou dívida' => 1, // -> Alto Valor dos Projetos
+                    'Um valor desafiador, mas dentro do fluxo normal' => 2,
+                    'Um valor baixo que não impacta o patrimônio consolidado' => 3,    // -> Baixo Valor de Projetos
+                ],
+            ],
+
+            'Consistência e Educação' => [
+                'Você dedica tempo para estudar sobre o mercado ou analisar o relatório da sua carteira?' => [
+                    'Não tenho o hábito de estudar ou acompanhar' => 1,           // -> Educação Financeira
+                    'Leio de forma esporádica' => 2,
+                    'Acompanho ativamente e busco constante aprendizado' => 3, // -> Educação financeira
+                ],
+                'O que você faz quando recebe uma renda extra significativa (bônus/herança/venda de bem)?' => [
+                    'Gasto com desejos imediatos ou quitação de imprevistos' => 1,
+                    'Utilizo parte para o consumo e guardo o restante' => 2,
+                    'Direciono 100% conforme meu planejamento estratégico' => 3,
                 ],
             ],
         ];
