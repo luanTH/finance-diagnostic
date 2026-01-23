@@ -156,7 +156,7 @@ class DiagnosticServicePF
                 'strong'  => 'Na fase de consolidação, a eficiência tributária é tudo. Um especialista pode ajudar a estruturar o usufruto do capital com o menor custo possível.',
             ],
             'Gestão de Dívidas' => [
-                'weak'    => 'Não tente resolver sozinho. Um planejador financeiro tem as ferramentas para renegociar taxas e estruturar uma quitação que não asfixie seu padrão de vida.',
+                'weak'    => 'Busque resolver essa situação o quanto antes. Com a ajuda de um planejador financeiro você terá as ferramentas necessárias para encontrar a melhor solução.',
                 'average' => 'Existem formas de reduzir o custo das suas dívidas atuais. Uma consultoria focada em crédito pode liberar um fôlego extra no seu orçamento.',
                 'strong'  => 'Parabéns. Sua saúde financeira permite que um consultor foque 100% em multiplicar seu capital em vez de apenas gerir passivos.',
             ],

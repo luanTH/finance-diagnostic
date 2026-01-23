@@ -62,12 +62,12 @@ class DiagnosticController extends Controller
 
         return DB::transaction(function () use ($request) {
             // 1. Salva ou atualiza o Lead
-            $lead = Lead::updateOrCreate(
-                ['email' => $request->lead['email']],
+            $lead = Lead::create(
                 [
                     'name' => $request->lead['name'],
                     'phone' => $request->lead['phone'],
                     'type' => $request->lead['type'],
+                    'email' => $request->lead['email']
                 ]
             );
 

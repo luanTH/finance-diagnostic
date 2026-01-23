@@ -55,6 +55,9 @@ watch(() => form.lead.phone, (newVal) => {
 watch(step, (newStep) => {
     if (newStep === props.questions.length) {
         renderRecaptcha();
+    }else {
+        recaptchaWidgetId.value = null;
+        form.lead.captcha_token = '';
     }
 });
 
@@ -96,10 +99,18 @@ const submit = () => {
 };
 
 const renderRecaptcha = async () => {
-    // Espera o Vue montar o HTML do formulário de lead
-    await nextTick();
+    await nextTick(); // Garante que o elemento 'recaptcha-widget' já existe no DOM [cite: 2026-01-20]
 
-    if (window.grecaptcha && document.getElementById('recaptcha-widget') && recaptchaWidgetId.value === null) {
+    const container = document.getElementById('recaptcha-widget');
+
+    if (window.grecaptcha && container) {
+        // Se já existia um widget, limpamos para evitar conflitos
+        if (recaptchaWidgetId.value !== null) {
+            container.innerHTML = ''; // Limpa o container manualmente
+            recaptchaWidgetId.value = null;
+        }
+
+        // Renderiza o novo widget
         recaptchaWidgetId.value = window.grecaptcha.render('recaptcha-widget', {
             'sitekey': siteKey,
             'callback': (token) => { form.lead.captcha_token = token; },
@@ -146,10 +157,10 @@ onMounted(() => {
             <form @submit.prevent>
 
                 <div v-if="step === -1" class="step-content text-center">
-                    <h1 v-if="type == 'pf'" class="text-4xl font-black text-slate-900 mb-6">
+                    <h1 v-if="type == 'pf'" class="text-3xl md:text-4xl font-black text-slate-900 mb-6">
                         Descubra o potencial da sua saúde <span class="text-indigo-600">financeira.</span>
                     </h1>
-                    <h1 v-else class="text-4xl font-black text-slate-900 mb-6">
+                    <h1 v-else class="text-3xl md:text-4xl font-black text-slate-900 mb-6">
                         Descubra o potencial da saúde <span class="text-indigo-600">financeira</span> da sua empresa.
                     </h1>
                     <p class="text-slate-500 text-lg mb-10">
@@ -163,7 +174,7 @@ onMounted(() => {
 
                         <Link
                             :href="route(type === 'pf' ? 'diagnostic.indexPj' : 'diagnostic.index')"
-                            class="flex items-center justify-center gap-2 text-slate-400 hover:text-indigo-600 font-bold text-sm transition-colors mt-4"
+                            class="flex items-center justify-center gap-2 text-slate-800 hover:text-indigo-600 font-bold text-xs sm:text-sm transition-colors mt-4"
                         >
                             <ArrowLeftRight class="w-4 h-4" />
                             Mudar para diagnóstico {{ type === 'pf' ? 'Empresarial (PJ)' : 'Pessoa Física (PF)' }}
@@ -215,8 +226,8 @@ onMounted(() => {
 
                     <div class="space-y-4">
                         <input v-model="form.lead.name" type="text" placeholder="Seu nome completo" class="form-input" />
-                        <p v-if="form.errors['lead.name']" class="text-red-500 text-xs mt-1">
-                            {{ form.errors['lead.name'] }}
+                        <p v-if="(form.lead.name.length > 0 && form.lead.name.length <= 3) || form.errors['lead.name']" class="text-red-500 text-xs mt-1">
+                            Adicione seu nome completo
                         </p>
 
                         <div class="relative">
@@ -242,7 +253,7 @@ onMounted(() => {
 
                         <div class="space-y-4">
                             <div class="flex justify-center py-2">
-                                <div id="recaptcha-widget"></div>
+                                <div id="recaptcha-widget" :key="'captcha-' + step"></div>
                             </div>
 
                             <div class="captcha-placeholder" v-if="!form.lead.captcha_token">
@@ -258,17 +269,17 @@ onMounted(() => {
                     <div class="flex flex-col mt-8 gap-4">
                         <button type="button" @click="submit" :disabled="!canSubmit" class="submit-btn">
                             <span v-if="form.processing" class="flex items-center gap-2"><Loader2 class="animate-spin" /> Processando...</span>
-                            <span v-else class="flex items-center gap-2">Gerar e Enviar Diagnóstico <Send class="w-5 h-5" /></span>
+                            <span v-else class="flex items-center gap-2">Enviar Diagnóstico <Send class="w-5 h-5" /></span>
                         </button>
                         <button v-if="!lockNavigation" @click="back" class="text-slate-400 font-bold text-sm cursor-pointer">Revisar respostas</button>
                     </div>
                 </div>
 
                 <div v-else class="step-content text-center py-10">
-                    <div class="success-icon"><CheckCircle class="w-20 h-20" /></div>
+                    <div class="success-icon"><CheckCircle class="w-16 h-16 sm:w-20 sm:h-20" /></div>
                     <h1 class="text-3xl font-black text-slate-900 mb-4">Relatório Enviado!</h1>
                     <p class="text-slate-600 mb-8 leading-relaxed">
-                        Verifique sua caixa de entrada. O diagnóstico detalhado já está a caminho.
+                        Verifique sua caixa de entrada. O diagnóstico detalhado foi enviado. (Caso não apareça, verifique span e lixo eletrônico)
                     </p>
                 </div>
 
@@ -282,14 +293,14 @@ onMounted(() => {
 
 .main-container { @apply min-h-screen w-full flex flex-col items-center justify-center p-4 relative overflow-hidden bg-[#0f1115]; }
 .dark-overlay { @apply absolute inset-0 bg-gradient-to-br from-blue-950 via-gray-900 to-blue-950 backdrop-blur-3xl pointer-events-none; }
-.glass-card { @apply w-full max-w-2xl bg-white rounded-[2rem] shadow-[0_30px_100px_rgba(0,0,0,0.5)] z-10 relative border border-slate-200 transition-all duration-500; }
+.glass-card { @apply w-full max-w-3xl sm:max-w-2xl bg-white rounded-[2rem] shadow-[0_30px_100px_rgba(0,0,0,0.5)] z-10 relative border border-slate-200 transition-all duration-500; }
 .step-content { @apply p-8 md:p-14 animate-in fade-in slide-in-from-bottom-4 duration-500; }
 .logo-wrapper { @apply mb-10 z-10; }
 .logo-icon { @apply object-cover w-14 rounded-full overflow-hidden; }
 .logo-text { @apply text-white font-black text-2xl tracking-tighter leading-none; }
 .logo-sub { @apply text-indigo-400 text-[10px] font-bold uppercase tracking-[0.3em]; }
 .form-input { @apply w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-2xl outline-none focus:border-indigo-500 focus:bg-white transition-all text-slate-700 font-medium; }
-.start-btn { @apply bg-indigo-600 hover:bg-indigo-700 text-white px-12 py-5 rounded-[1.5rem] font-black text-xl shadow-2xl shadow-indigo-500/40 flex items-center mx-auto transition-all cursor-pointer; }
+.start-btn { @apply bg-indigo-600 hover:bg-indigo-700 text-white px-12 py-5 rounded-[1.5rem] font-black text-lg sm:text-xl shadow-2xl shadow-indigo-500/40 flex items-center mx-auto transition-all cursor-pointer; }
 .submit-btn { @apply w-full py-5 rounded-2xl font-black text-xl flex items-center justify-center transition-all disabled:bg-slate-100 disabled:text-slate-300 bg-emerald-500 hover:bg-emerald-600 text-white shadow-xl shadow-emerald-500/20 cursor-pointer; }
 .category-tag { @apply px-3 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-black uppercase tracking-widest mb-4 inline-block; }
 .question-text { @apply text-2xl md:text-3xl font-bold text-slate-800 mb-8 leading-tight; }
